@@ -47,9 +47,11 @@ if st.button("🎨 Cambiar color de estilo"):
 st.markdown(
     f"""
     <style>
+    /* Cambiar color de todos los textos */
     h1, h2, h3, h4, h5, h6, p, .stMarkdown {{
         color: {st.session_state.color} !important;
     }}
+    /* Líneas horizontales de adorno */
     hr {{
         border: 2px solid {st.session_state.color};
     }}
