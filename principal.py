@@ -64,40 +64,56 @@ st.markdown(
 # 4. Interfaz en Streamlit
 # ---------------------
 st.markdown("<hr>", unsafe_allow_html=True)
-st.title("📊 Demo de ML Supervisado con Datos Simulados")
+st.title("📊 Demo de ML Supervisado con Datos Simulados o CSV")
 st.markdown("<hr>", unsafe_allow_html=True)
 
-# Generar dataset
-datos = generar_datos()
+# ---------------------
+# 5. Cargar archivo CSV opcional
+# ---------------------
+archivo = st.file_uploader("📂 Cargar archivo CSV", type=["csv"])
+
+if archivo is not None:
+    datos = pd.read_csv(archivo)
+    st.success("✅ Archivo cargado correctamente")
+else:
+    datos = generar_datos()
+    st.info("ℹ️ No se cargó ningún archivo, usando datos simulados")
+
+# Mostrar dataset organizado
 st.subheader("Vista previa de los datos")
-st.write(datos.head())
-
-# Seleccionar tamaño de test
-test_size = st.slider("Proporción de datos de validación", 0.1, 0.5, 0.3, 0.05)
-
-# División de datos
-X = datos.drop("target", axis=1)
-y = datos["target"]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
-
-st.write(f"**Tamaño entrenamiento:** {X_train.shape[0]} | **Tamaño validación:** {X_test.shape[0]}")
+st.dataframe(datos.head(10))  # organizado con tabla interactiva
 
 # ---------------------
-# 5. Entrenar modelo simple
+# 6. Preparar datos y entrenamiento
 # ---------------------
-modelo = LogisticRegression(max_iter=500)
-modelo.fit(X_train, y_train)
-y_pred = modelo.predict(X_test)
+if "target" not in datos.columns:
+    st.error("❌ El dataset cargado no tiene la columna 'target'. Agrega una columna de objetivo para entrenar el modelo.")
+else:
+    test_size = st.slider("Proporción de datos de validación", 0.1, 0.5, 0.3, 0.05)
 
-st.subheader("Resultados del modelo (Logistic Regression)")
-st.text(classification_report(y_test, y_pred))
+    X = datos.drop("target", axis=1)
+    y = datos["target"]
 
-# ---------------------
-# 6. Visualización
-# ---------------------
-st.subheader("Matriz de confusión")
-fig, ax = plt.subplots()
-sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt="d", cmap="Blues", ax=ax)
-st.pyplot(fig)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+
+    st.write(f"**Tamaño entrenamiento:** {X_train.shape[0]} | **Tamaño validación:** {X_test.shape[0]}")
+
+    # ---------------------
+    # 7. Entrenar modelo simple
+    # ---------------------
+    modelo = LogisticRegression(max_iter=500)
+    modelo.fit(X_train, y_train)
+    y_pred = modelo.predict(X_test)
+
+    st.subheader("Resultados del modelo (Logistic Regression)")
+    st.text(classification_report(y_test, y_pred))
+
+    # ---------------------
+    # 8. Visualización
+    # ---------------------
+    st.subheader("Matriz de confusión")
+    fig, ax = plt.subplots()
+    sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt="d", cmap="Blues", ax=ax)
+    st.pyplot(fig)
 
 st.markdown("<hr>", unsafe_allow_html=True)
