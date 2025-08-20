@@ -1,0 +1,15 @@
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Archivos de Jupyter
+.ipynb_checkpoints/
+
+# Configuración local
+.env
+*.sqlite3
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
